@@ -54,16 +54,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     }
     */
 
-    // ƒQ[ƒ€ƒ‹[ƒv
+    // ã‚²ãƒ¼ãƒ ãƒ«ãƒ¼ãƒ—
     while (1)
     {
 
         if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
             //============================================
-            // ƒEƒBƒ“ƒhƒEƒƒbƒZ[ƒWˆ—
+            // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†
             //============================================
-            // I—¹ƒƒbƒZ[ƒW‚ª‚«‚½
+            // çµ‚äº†ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
             if (msg.message == WM_QUIT) {
                 break;
             }
@@ -75,18 +75,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
 
     //============================================
-    // ƒQ[ƒ€‚Ìˆ—‚ğ‘‚­
+    // ã‚²ãƒ¼ãƒ ã®å‡¦ç†
     //============================================
 
-    // ‰æ–Ê‚ğÂF‚Å“h‚è‚Â‚Ô‚·
+    // ç”»é¢ã‚’é’è‰²ã§å¡—ã‚Šã¤ã¶ã™
     float color[4] = { 0.2f, 0.2f, 1.0f, 1.0f };
     D3D.m_deviceContext->ClearRenderTargetView(D3D.m_backBufferView.Get(), color);
 
-    // ƒoƒbƒNƒoƒbƒtƒ@‚Ì“à—e‚ğ‰æ–Ê‚É•\¦
+    // ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ã®å†…å®¹ã‚’ç”»é¢ã«è¡¨ç¤º
     D3D.m_swapChain->Present(1, 0);
 }
 
-// Direct3DƒCƒ“ƒXƒ^ƒ“ƒXíœ
+// Direct3Dã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹å‰Šé™¤
 Direct3D::DeleteInstance();
 
     return (int) msg.wParam;
@@ -142,9 +142,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
       return FALSE;
    }
 
-   // Direct3DƒCƒ“ƒXƒ^ƒ“ƒXì¬
+   // Direct3Dã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ä½œæˆ
    Direct3D::CreateInstance();
-   // Direct3D‰Šú‰»
+   // Direct3DåˆæœŸåŒ–
    D3D.Initialize(hWnd, 1280, 720);
 
    ShowWindow(hWnd, nCmdShow);
