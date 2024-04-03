@@ -5,7 +5,7 @@
 bool Direct3D::Initialize(HWND hWnd, int width, int height)
 {
 	//=====================================================
-	// �t�@�N�g���[�쐬(�r�f�I �O���t�B�b�N�̐ݒ�̗񋓂�w��Ɏg�p�����I�u�W�F�N�g)
+	// ファクトリー作成(ビデオ グラフィックの設定の列挙や指定に使用されるオブジェクト)
 	//=====================================================
 	ComPtr<IDXGIFactory> factory;
 
@@ -15,13 +15,13 @@ bool Direct3D::Initialize(HWND hWnd, int width, int height)
 	}
 
 	//=====================================================
-	//�f�o�C�X����(��Ƀ��\�[�X�쐬���Ɏg�p����I�u�W�F�N�g)
+	//デバイス生成(主にリソース作成時に使用するオブジェクト)
 	//=====================================================
 	UINT creationFlags = 0;
 
 #ifdef _DEBUG
-	// DEBUG�r���h����Direct3D�̃f�o�b�O��L���ɂ���
-	// (�������d�����ׂ����G���[���킩��)
+	// DEBUGビルド時はDirect3Dのデバッグを有効にする
+	// (すごく重いが細かいエラーがわかる)
 	creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
@@ -36,7 +36,7 @@ bool Direct3D::Initialize(HWND hWnd, int width, int height)
 		D3D_FEATURE_LEVEL_9_1,	// Direct3D 9.1   ShaderModel 3
 	};
 
-	// �f�o�C�X�ƂŃf�o�C�X�R���e�L�X�g���쐬
+	// デバイスとでデバイスコンテキストを作成
 	D3D_FEATURE_LEVEL futureLevel;
 	if (FAILED(D3D11CreateDevice(
 		nullptr,
@@ -54,39 +54,39 @@ bool Direct3D::Initialize(HWND hWnd, int width, int height)
 	}
 
 	//=====================================================
-	// �X���b�v�`�F�C���쐬(�t�����g�o�b�t�@�ɕ\���\�ȃo�b�N�o�b�t�@��������)
+	// スワップチェイン作成(フロントバッファに表示可能なバックバッファを持つもの)
 	//=====================================================
-	DXGI_SWAP_CHAIN_DESC scDesc = {};		// �X���b�v�`�F�[���̐ݒ�f�[�^
-	scDesc.BufferDesc.Width = width;						// ��ʂ̕�
-	scDesc.BufferDesc.Height = height;						// ��ʂ̍���
-	scDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;	// �o�b�t�@�̌`��
+	DXGI_SWAP_CHAIN_DESC scDesc = {};		// スワップチェーンの設定データ
+	scDesc.BufferDesc.Width = width;						// 画面の幅
+	scDesc.BufferDesc.Height = height;						// 画面の高さ
+	scDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;	// バッファの形式
 	scDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 	scDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	scDesc.BufferDesc.RefreshRate.Numerator = 0;
 	scDesc.BufferDesc.RefreshRate.Denominator = 1;
-	scDesc.SampleDesc.Count = 1;							// MSAA�͎g�p���Ȃ�
-	scDesc.SampleDesc.Quality = 0;							// MSAA�͎g�p���Ȃ�
-	scDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;	// �o�b�t�@�̎g�p���@
-	scDesc.BufferCount = 2;									// �o�b�t�@�̐�
+	scDesc.SampleDesc.Count = 1;							// MSAAは使用しない
+	scDesc.SampleDesc.Quality = 0;							// MSAAは使用しない
+	scDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;	// バッファの使用方法
+	scDesc.BufferCount = 2;									// バッファの数
 	scDesc.OutputWindow = hWnd;
-	scDesc.Windowed = TRUE;									// �E�B���h�E���[�h
+	scDesc.Windowed = TRUE;									// ウィンドウモード
 	scDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	scDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-	// �X���b�v�`�F�C���̍쐬
+	// スワップチェインの作成
 	if (FAILED(factory->CreateSwapChain(m_device.Get(), &scDesc, &m_swapChain)))
 	{
 		return false;
 	}
 
-	// �X���b�v�`�F�C������o�b�N�o�b�t�@���\�[�X�擾
+	// スワップチェインからバックバッファリソース取得
 	ComPtr<ID3D11Texture2D> pBackBuffer;
 	if (FAILED(m_swapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer))))
 	{
 		return false;
 	}
 
-	// �o�b�N�o�b�t�@���\�[�X�p��RTV���쐬
+	// バックバッファリソース用のRTVを作成
 	D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
 	rtvDesc.Format = scDesc.BufferDesc.Format;
 	rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
@@ -96,13 +96,13 @@ bool Direct3D::Initialize(HWND hWnd, int width, int height)
 	}
 
 	//=====================================================
-	// �f�o�C�X�R���e�L�X�g�ɕ`��Ɋւ���ݒ���s���Ă���
+	// デバイスコンテキストに描画に関する設定
 	//=====================================================
 
-	// �o�b�N�o�b�t�@��RT�Ƃ��ăZ�b�g
+	// バックバッファをRTとしてセット
 	m_deviceContext->OMSetRenderTargets(1, m_backBufferView.GetAddressOf(), nullptr);
 
-	// �r���[�|�[�g�̐ݒ�
+	// ビューポートの設定
 	D3D11_VIEWPORT vp = { 0.0f, 0.0f, (float)width, (float)height, 0.0f, 1.0f };
 	m_deviceContext->RSSetViewports(1, &vp);
 
